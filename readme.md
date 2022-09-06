@@ -126,7 +126,7 @@ Running the same program, but with version `5.1.49` gets us the expected output 
 
 ## Deep dive
 
-Scrolling back through the console output of the orginal run (v. `8.0.30`) reveals that all the
+Scrolling back through the console output of the original run (v. `8.0.30`) reveals that all the
 disabled jobs ran into the NPE generated in `com.mysql.cj.AbstractQuery::stopQueryTimer` on line
 228, which is:
 ```java
