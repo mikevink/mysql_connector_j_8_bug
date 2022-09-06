@@ -10,6 +10,8 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import org.example.db.error.ESQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main
 {
@@ -17,12 +19,14 @@ public class Main
     {
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
         System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yyyy-MM-dd HH:mm:ss.S");
+        final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
         final JobRunner runner = new JobRunner("sqltest", 30, 10);
         runner.init();
         runner.start();
         runner.waitForJobs(JobState.Running);
+        logger.info("Sleeping for 5s");
         Thread.sleep(5000);
-        killMysql();
+        killMysql(logger);
         runner.waitForJobs(JobState.Disabled, JobState.Disconnected, JobState.Timeout);
         runner.stop();
         runner.printLastState();
@@ -30,21 +34,22 @@ public class Main
         System.exit(0);
     }
 
-    private static void killMysql() throws InterruptedException, IOException, ExecutionException
+    private static void killMysql(final Logger logger) throws InterruptedException, IOException, ExecutionException
     {
+        logger.info("Killing MySQL");
         // replace this bit with whatever can kill a mysql server on your end
         final String homeDirectory = System.getProperty("user.home");
         final String mysqlKillScript = String.format("%s/bin/killMysql.sh", homeDirectory);
         // this ough to (mostly) work
         final Process process = Runtime.getRuntime().exec(mysqlKillScript);
-        StreamGobbler streamGobbler =
-            new StreamGobbler(process.getInputStream(), System.out::println);
+        StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), logger::debug);
         Future<?> future = Executors.newSingleThreadExecutor().submit(streamGobbler);
 
         int exitCode = process.waitFor();
         assert exitCode == 0;
 
         future.get();
+        logger.info("MySQL is dead");
     }
 
     private static class StreamGobbler implements Runnable

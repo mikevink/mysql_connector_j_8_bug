@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import org.example.db.DSFactory;
 import org.example.db.Dao;
 import org.example.db.error.ESQLException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JobRunner
@@ -22,6 +23,7 @@ public class JobRunner
     private final ScheduledExecutorService scheduler;
     private final String schemaPrefix;
     private final int numJobs;
+    private final Logger logger;
     private List<Job> jobs;
 
     public JobRunner(final String schemaPrefix, final int numJobs, final int numCores)
@@ -29,6 +31,7 @@ public class JobRunner
         this.schemaPrefix = schemaPrefix;
         this.numJobs = numJobs;
         scheduler = Executors.newScheduledThreadPool(numCores);
+        logger = LoggerFactory.getLogger(JobRunner.class.getSimpleName());
     }
 
     public void init() throws ESQLException
@@ -42,16 +45,19 @@ public class JobRunner
             dao.init();
         }
         jobs = daos.stream().map(dao -> new Job(dao, scheduler)).collect(Collectors.toList());
+        logger.info("Initialisation complete");
     }
 
     public void start()
     {
         jobs.forEach(Job::schedule);
+        logger.info("Jobs started");
     }
 
     @SuppressWarnings("BusyWait")
     public void waitForJobs(final JobState... states) throws InterruptedException
     {
+        logger.info("Waiting for all jobs to be {}", Arrays.toString(states));
         final int target = jobs.size();
         final Freezer freezer = new Freezer(states);
         int count = 0;
@@ -68,17 +74,22 @@ public class JobRunner
             Thread.sleep(1000);
             count++;
         }
+        logger.info("All jobs are {}", Arrays.toString(states));
     }
 
     public void printLastState()
     {
-        final Freezer freezer = new Freezer(null);
-        freezer.freeze(jobs);
-        LoggerFactory.getLogger(JobRunner.class).info(freezer.toString());
+        final Freezer all = new Freezer(null);
+        all.freeze(jobs);
+        logger.info(all.toString());
+        final Freezer disabled = new Freezer(new JobState[]{JobState.Disabled});
+        disabled.freezeAndFilter(jobs);
+        logger.info(disabled.toString("Disabled jobs (should be empty)"));
     }
 
     public void stop()
     {
+        logger.info("Stopping the executor / jobs");
         jobs.forEach(Job::stop);
         scheduler.shutdown();
     }
@@ -102,22 +113,36 @@ public class JobRunner
             frozen = new ArrayList<>();
         }
 
-        public List<Job.FrozenJob> freeze(final List<Job> jobs)
+        public void freeze(final List<Job> jobs)
         {
             frozen.clear();
             frozen.addAll(jobs.stream().map(Job::freeze).collect(Collectors.toList()));
+        }
+
+        public List<Job.FrozenJob> freezeAndFilter(final List<Job> jobs)
+        {
+            frozen.clear();
+            frozen.addAll(
+                jobs.stream().map(Job::freeze).filter(filter).collect(Collectors.toList())
+            );
             return frozen;
         }
 
         public long filterAndCount(final List<Job> jobs)
         {
-            return freeze(jobs).stream().filter(filter).count();
+            return freezeAndFilter(jobs).size();
         }
 
         public String toString()
         {
+            return toString("Job States");
+        }
+
+        public String toString(final String tag)
+        {
             return String.format(
-                "Frozen Jobs:\n%s",
+                "%s:\n%s",
+                tag,
                 frozen.stream()
                     .map(Job.FrozenJob::toString)
                     .collect(Collectors.joining("\n"))

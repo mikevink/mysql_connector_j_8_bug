@@ -57,9 +57,9 @@ public class ESQLException extends SQLException
 
     public void log(final Logger logger, final String message)
     {
-        logger.error(message, this);
-        logger.error("Query: {}", this.query);
-        logger.error("SQLState: {}", this.getSQLState());
-        logger.error("VendorError: {}", this.getErrorCode());
+        logger.debug(message, this);
+        logger.debug("Query: {}", this.query);
+        logger.debug("SQLState: {}", this.getSQLState());
+        logger.debug("VendorError: {}", this.getErrorCode());
     }
 }

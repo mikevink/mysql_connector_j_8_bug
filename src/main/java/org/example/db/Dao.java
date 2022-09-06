@@ -32,7 +32,7 @@ public class Dao
 
     public void init() throws ESQLException
     {
-        this.logger.info("Initialising db");
+        this.logger.debug("Initialising db");
         runDdl(String.format("DROP DATABASE IF EXISTS %s;", this.schema));
         runDdl(String.format("CREATE DATABASE %s;", this.schema));
         runDdl(String.format(
@@ -44,7 +44,7 @@ public class Dao
             this.table
         ));
         insert("init");
-        this.logger.info("Current number of rows is: {}", count());
+        this.logger.trace("Current number of rows is: {}", count());
         this.logger.debug("Initialisation complete");
     }
 

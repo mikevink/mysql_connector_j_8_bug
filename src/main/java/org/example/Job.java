@@ -48,8 +48,8 @@ public class Job implements Runnable
         try
         {
             state.compareAndSet(JobState.Disconnected, JobState.Running);
-            logger.debug("Starting Job");
-            logger.info("Row Count: {}", dao.count());
+            logger.trace("Starting Job");
+            logger.debug("Row Count: {}", dao.count());
 
             dao.insert("run");
             if (JobState.Running == state.get())
@@ -82,7 +82,7 @@ public class Job implements Runnable
         }
         finally
         {
-            logger.debug("Finished Job");
+            logger.trace("Finished Job");
             maybeSetThreadName(oldName);
         }
     }
