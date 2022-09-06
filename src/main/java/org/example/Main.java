@@ -12,7 +12,7 @@ public class Main
     public static void main(String[] args) throws ESQLException, InterruptedException, IOException, ExecutionException
     {
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
-        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yyyy-MM-dd HH:mm:ss.S");
+        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yyyy-MM-dd HH:mm:ss.SSS");
         final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
         final MySQLController mySQLController = mySQLController();
         mySQLController.start();
