@@ -24,3 +24,32 @@ This causes a problem for us as we cannot distinguish the NPE from any other non
 thus we no longer attempt to reconnect after a backoff period.
 
 When running the same code with `MySQL Connector/J 5.1.49`, all errors are handled as expected.
+
+## Requirements
+* JDK 11
+* local installation of MySQL server (tested with 5.7)
+* 1 executable script that can start a MySQL server instance
+* 1 executable script that can stop the MySQL server instance started above
+* JetBrains IntelliJ
+
+Note: it should be possible to run the program without IntelliJ, as long as you are familiar 
+enough with gradle.
+
+## Setup
+Before running the project, you need to update the `mySQLController()` method in `Main.java` to 
+point to the correct start & stop scripts for a MySQL server.
+```java
+// example script configuration
+final String homeDirectory = System.getProperty("user.home");
+final String startScriptPath = String.format("%s/bin/startMySQL.sh", homeDirectory);
+final String stopScriptPath = String.format("%s/bin/stopMySQL.sh", homeDirectory);
+```
+
+The sample program expects to connect to MySQL using the following configuration
+```java
+source.setUrl("jdbc:mysql://127.0.0.1:3306");
+source.setUsername("root");
+source.setPassword("");
+```
+If your server is set up differently, please update the `create()` method in `DSFactory.java` as 
+necessary.
