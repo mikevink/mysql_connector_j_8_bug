@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("idea")
 }
 
 group = "org.example"
@@ -21,4 +22,10 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+idea {
+    module {
+        isDownloadSources = true
+    }
 }
