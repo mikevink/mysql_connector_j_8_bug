@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+//    implementation("mysql:mysql-connector-java:5.1.49")
     implementation("mysql:mysql-connector-java:8.0.30")
     implementation("org.apache.commons:commons-dbcp2:2.9.0")
     implementation("org.slf4j:slf4j-api:2.0.0")
