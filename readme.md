@@ -195,3 +195,4 @@ breakpoint:
    suspend: disabled
    evaluate and log: 'System.currentTimeMillis() + " BREAKPOINT: startQueryTimer on " + this + " with " + this.session + " and " + timeoutTask + " || Stack: " + Arrays.toString(Thread.currentThread().getStackTrace())'
 ```
+The full output of a Debug run with the above breakpoints can be found in `debug_with_extra_points.logs`
