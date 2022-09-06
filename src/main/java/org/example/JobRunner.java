@@ -26,11 +26,11 @@ public class JobRunner
     private final Logger logger;
     private List<Job> jobs;
 
-    public JobRunner(final String schemaPrefix, final int numJobs, final int numCores)
+    public JobRunner(final String schemaPrefix, final int numJobs, final int corePoolSize)
     {
         this.schemaPrefix = schemaPrefix;
         this.numJobs = numJobs;
-        scheduler = Executors.newScheduledThreadPool(numCores);
+        scheduler = Executors.newScheduledThreadPool(corePoolSize);
         logger = LoggerFactory.getLogger(JobRunner.class.getSimpleName());
     }
 
