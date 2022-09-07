@@ -190,7 +190,7 @@ breakpoint:
    evaluate and log: 'System.currentTimeMillis() + " BREAKPOINT: startQueryTimer on " + this + " with " + this.session + " and " + timeoutTask + " || Stack: " + Arrays.toString(Thread.currentThread().getStackTrace())'
 ```
 The full output of a Debug run with the above breakpoints can be found in 
-`debug_with_extra_points.logs`.
+`debug_with_extra_points.log`.
 
 On lines 759-761 of the above file, we find the NPEs generated in this run. We can use the hash 
 of the `com.mysql.cj.SimpleQuery` (which extends `AbstractQuery`)  classes to filter out only the 
